@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vormide esitamine</title>
+  <title>Submit Form</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Vormi esitamine</h1>
-  <form action="/submit-form" method="post">
-    <label for="username">Nimi:</label>
-    <input type="text" id="name" name="username"><br>
-    <label for="password">Parool: </label>
-    <input type="password" id="password" name="password"><br>
-    <label for="email">E-post:</label>
-    <input id="email" name="email"></input><br>
-    <button id="esita" type="submit">Esita</button>
-  </form>
-  <nav>
-    <a href="/">Avaleht</a>
-    <a href="/contact">Teave</a>
-  </nav>
+  <div class="container">
+    <h1>Submit Form</h1>
+    <form action="/submit-form" method="post">
+      <label for="username">Name:</label>
+      <input type="text" id="username" name="username" required>
+      
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+      
+      <button type="submit">Submit</button>
+    </form>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </div>
 </body>
 </html>

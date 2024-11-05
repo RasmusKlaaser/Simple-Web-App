@@ -3,22 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teave</title>
+  <title>About Us</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Teave</h1>
-  <p>See on teave leht.</p>
-  <form action="/submit-form" method="post">
-    <label for="name">Nimi:</label>
-    <input type="text" id="name" name="name"><br>
-    <label for="email">E-mail:</label>
-    <input type="email" id="email" name="email"><br>
-    <label for="message">Sõnum:</label>
-    <textarea id="message" name="message"></textarea><br>
-    <button type="submit">Esita</button>
-  <nav>
-    <a href="/">Avaleht</a>
-    <a href="/contact">Kontakt</a>
-  </nav>
+  <div class="container">
+    <h1>About Us</h1>
+    <p>This is the about page content.</p>
+    <form action="/submit-form" method="post">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+      
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+      
+      <button type="submit">Submit</button>
+    </form>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/contact">Contact</a>
+    </nav>
+  </div>
 </body>
 </html>
