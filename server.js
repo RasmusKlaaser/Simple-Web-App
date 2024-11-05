@@ -1,33 +1,26 @@
+// Import necessary modules
 const express = require('express');
 const path = require('path');
+const mysql = require('mysql');
+const bodyParser = require('body-parser');
+const { hashPassword } = require('./auth');
+
 const app = express();
 const port = 3000;
 
-// Serve static files
-app.use(express.static('public'));
-app.use(express.urlencoded({ extended: true }));
-
-// Serve login page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
-
-// Middleware to parse JSON request bodies
+// Middleware for serving static files from "public" folder and parsing form data
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// MySQL connection setup
+// MySQL database connection setup
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'myuser',
   password: 'password1234',
-  database: 'HAJUSRAKENDUS', // Replace with your actual database name
+  database: 'HAJUSRAKENDUS',
 });
 
-// Connect to the MySQL database
 db.connect((err) => {
   if (err) {
     console.error('Error connecting to the database:', err);
@@ -36,19 +29,47 @@ db.connect((err) => {
   console.log('Connected to the MySQL database');
 });
 
-// Endpoint to insert a new user
-app.post('/submit-form', (req, res) => {
-  const { username, password, email } = req.body; // Get values from the request body
+// Route for the login page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
-  const query = 'INSERT INTO accounts (username, password, email) VALUES (?, ?, ?)';
-  
-  db.query(query, [username, password, email], (err, result) => {
+// Route for the form submission page
+app.get('/form', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'form.html'));
+});
+
+// Route for the contact page
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
+// Route for the about page (optional)
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
+// Endpoint to handle form submission
+app.post('/submit-form', (req, res) => {
+  const { username, password, email, message } = req.body;
+
+  if (!username || !password || !email || !message) {
+    return res.status(400).send('All fields are required.');
+  }
+
+  const hashedPassword = hashPassword(password);
+  const query = 'INSERT INTO accounts (username, password, email, message) VALUES (?, ?, ?, ?)';
+
+  db.query(query, [username, hashedPassword, email, message], (err) => {
     if (err) {
       console.error('Error inserting user:', err);
       return res.status(500).send('Error inserting user');
     }
     
-    res.send(`<h1>Vorm saadeti edukalt</h1><p>Aitäh, ${username}! Teie email: "${email}"</p><a href="/form">Esita veel üks vorm</a>`);
+    res.send(`<h1>Form successfully submitted</h1>
+              <p>Thank you, ${username}! Your email: "${email}"</p>
+              <p>Your message: "${message}"</p>
+              <a href="/form">Submit another form</a>`);
   });
 });
 
@@ -56,9 +77,8 @@ app.post('/submit-form', (req, res) => {
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  // Query to check the credentials against the database
   const query = 'SELECT * FROM accounts WHERE username = ? AND password = ?';
-  
+
   db.query(query, [username, password], (err, results) => {
     if (err) {
       console.error('Error checking login:', err);
@@ -66,34 +86,14 @@ app.post('/login', (req, res) => {
     }
 
     if (results.length > 0) {
-      res.send(`<h1>Tere tulemast, ${username}!</h1><a href="/">Mine tagasi</a>`);
-    } else if (username === "") {
-      res.send('<h1>Kasutajanimi on nõutud</h1>');
-    } else if (password === "") {
-      res.send('<h1>Parool on nõutud</h1>');
+      res.send(`<h1>Welcome, ${username}!</h1><a href="/">Go back</a>`);
     } else {
-      res.send('<h1>Vale kasutajanimi või parool</h1><a href="/">Proovi uuesti</a>');
+      res.send('<h1>Invalid username or password</h1><a href="/">Try again</a>');
     }
   });
 });
 
-
-// Serve form page
-app.get('/form', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'form.html'));
-});
-
-
-// Serve about page
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'about.html'));
-});
-
-// Serve contact page
-app.get('/contact', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
-});
-
+// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
